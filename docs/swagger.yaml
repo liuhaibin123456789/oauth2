@@ -1,0 +1,68 @@
+definitions:
+  model.Err:
+    properties:
+      err_info:
+        description: 错误信息
+        type: string
+      status:
+        description: 状态码
+        type: integer
+    type: object
+  model.Success:
+    properties:
+      data:
+        description: 数据源
+      status:
+        description: 状态码
+        type: integer
+    type: object
+host: localhost:8084
+info:
+  contact: {}
+  description: aouth2学习
+  title: aouth2实现
+  version: "1.0"
+paths:
+  /authorization-code:
+    post:
+      parameters:
+      - description: 开放平台申请的应用ID
+        in: query
+        name: client_id
+        required: true
+        type: string
+      - description: 授权成功后，跳转的地址
+        in: query
+        name: redirect_uri
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 请求错误
+          schema:
+            $ref: '#/definitions/model.Err'
+      summary: 获取github授权码
+  /redirect:
+    post:
+      parameters:
+      - description: 授权码
+        in: query
+        name: code
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 请求错误
+          schema:
+            $ref: '#/definitions/model.Err'
+      summary: 获取重定向后的code url参数
+securityDefinitions:
+  CoreAPI:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

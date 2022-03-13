@@ -1,0 +1,103 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "aouth2学习",
+        "title": "aouth2实现",
+        "contact": {},
+        "version": "1.0"
+    },
+    "host": "localhost:8084",
+    "paths": {
+        "/authorization-code": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "获取github授权码",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "开放平台申请的应用ID",
+                        "name": "client_id",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "授权成功后，跳转的地址",
+                        "name": "redirect_uri",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "请求错误",
+                        "schema": {
+                            "$ref": "#/definitions/model.Err"
+                        }
+                    }
+                }
+            }
+        },
+        "/redirect": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "获取重定向后的code url参数",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "授权码",
+                        "name": "code",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "请求错误",
+                        "schema": {
+                            "$ref": "#/definitions/model.Err"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "model.Err": {
+            "type": "object",
+            "properties": {
+                "err_info": {
+                    "description": "错误信息",
+                    "type": "string"
+                },
+                "status": {
+                    "description": "状态码",
+                    "type": "integer"
+                }
+            }
+        },
+        "model.Success": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "description": "数据源"
+                },
+                "status": {
+                    "description": "状态码",
+                    "type": "integer"
+                }
+            }
+        }
+    },
+    "securityDefinitions": {
+        "CoreAPI": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
+        }
+    }
+}
