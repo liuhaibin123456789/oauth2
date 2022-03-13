@@ -27,7 +27,7 @@ func main() {
 	}
 	router.Use(middleware.Cors())
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler)) //注册swagger访问路由
-	router.POST("/authorization-code", api.PostCode)                          //获取授权码
+	router.GET("/authorization-code", api.CreateCode)                         //获取授权码
 	router.POST("/redirect", api.Code)                                        //该路由用于获取重定向后的code url参数
 	/*
 		router.POST("/access-token", PostToken)                                   //通过授权码获取github的token

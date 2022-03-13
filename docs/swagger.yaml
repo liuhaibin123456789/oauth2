@@ -24,7 +24,7 @@ info:
   version: "1.0"
 paths:
   /authorization-code:
-    post:
+    get:
       parameters:
       - description: 开放平台申请的应用ID
         in: query

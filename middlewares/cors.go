@@ -42,7 +42,7 @@ func Cors() gin.HandlerFunc {
 			c.AbortWithStatus(http.StatusPaymentRequired)
 			return
 		}
-		// 处理请求
+		//处理请求
 		c.Next()
 	}
 }

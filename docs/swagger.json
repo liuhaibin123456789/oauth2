@@ -9,7 +9,7 @@
     "host": "localhost:8084",
     "paths": {
         "/authorization-code": {
-            "post": {
+            "get": {
                 "produces": [
                     "application/json"
                 ],

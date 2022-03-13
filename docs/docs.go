@@ -17,7 +17,7 @@ const docTemplate = `{
     "basePath": "{{.BasePath}}",
     "paths": {
         "/authorization-code": {
-            "post": {
+            "get": {
                 "produces": [
                     "application/json"
                 ],
