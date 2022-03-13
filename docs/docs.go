@@ -66,7 +66,7 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
-                "summary": "获取github授权码（没有找到swagger对应重定向得注解耶。swagger调试接口还不行，所以只能使用postman或者浏览器测试了）",
+                "summary": "获取github授权码（没有找到swaggo对应重定向得注解耶。swagger调试接口还不行，所以只能使用postman或者浏览器测试了）",
                 "parameters": [
                     {
                         "type": "string",
