@@ -1,4 +1,18 @@
 definitions:
+  model.AcceptGitHubToken:
+    properties:
+      access_token:
+        description: token字符串
+        type: string
+      scope:
+        type: string
+      token_type:
+        description: token类型,一般放在Authorization的bearer字符串后面
+        type: string
+    type: object
+  model.AcceptGitHubUser:
+    additionalProperties: true
+    type: object
   model.Err:
     properties:
       err_info:
@@ -23,18 +37,27 @@ info:
   title: aouth2实现
   version: "1.0"
 paths:
-  /authorization-code:
-    get:
+  /access-token:
+    post:
       parameters:
-      - description: 开放平台申请的应用ID
+      - description: 授权码
+        in: query
+        name: code
+        required: true
+        type: string
+      - description: 授权客户端id
         in: query
         name: client_id
         required: true
         type: string
-      - description: 授权成功后，跳转的地址
+      - description: 客户端密钥
+        in: query
+        name: client_secret
+        required: true
+        type: string
+      - description: 用户获得授权后被发送到的应用程序中的 URL
         in: query
         name: redirect_uri
-        required: true
         type: string
       produces:
       - application/json
@@ -43,9 +66,25 @@ paths:
           description: 请求错误
           schema:
             $ref: '#/definitions/model.Err'
-      summary: 获取github授权码
+      summary: 通过code拿取github颁发的token
+  /authorization-code:
+    get:
+      parameters:
+      - description: 开放平台申请的应用ID
+        in: query
+        name: client_id
+        required: true
+        type: string
+      - description: 授权成功后，跳转的地址,GitHub已配置回调url，此处为可选
+        in: query
+        name: redirect_uri
+        type: string
+      produces:
+      - application/json
+      responses: {}
+      summary: 获取github授权码（没有找到swagger对应重定向得注解耶。swagger调试接口还不行，所以只能使用postman或者浏览器测试了）
   /redirect:
-    post:
+    get:
       parameters:
       - description: 授权码
         in: query
@@ -60,6 +99,18 @@ paths:
           schema:
             $ref: '#/definitions/model.Err'
       summary: 获取重定向后的code url参数
+  /user-info:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 请求错误
+          schema:
+            $ref: '#/definitions/model.Err'
+      security:
+      - CoreAPI: []
+      summary: 通过token拿取资源
 securityDefinitions:
   CoreAPI:
     in: header

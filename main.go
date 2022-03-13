@@ -28,12 +28,9 @@ func main() {
 	router.Use(middleware.Cors())
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler)) //注册swagger访问路由
 	router.GET("/authorization-code", api.CreateCode)                         //获取授权码
-	router.POST("/redirect", api.Code)                                        //该路由用于获取重定向后的code url参数
-	/*
-		router.POST("/access-token", PostToken)                                   //通过授权码获取github的token
-		router.POST("/user-info", PostUser)                                       //携带token获取用户信息,没有就创建
-	*/
+	router.GET("/redirect", api.Code)                                         //该路由用于获取重定向后的code url参数
+	router.POST("/access-token", api.PostToken)                               //通过授权码获取github的token
+	router.GET("/user-info", api.User)                                        //携带token获取用户信息,没有就创建
+	router.POST("user", api.CreateUser)                                       //调用第三方资源获取的信息，实现注册
 	router.Run(":8084")
 }
-
-//提交失误，补充注释作为修改，再次提交

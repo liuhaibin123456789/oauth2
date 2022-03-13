@@ -16,26 +16,39 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/authorization-code": {
-            "get": {
+        "/access-token": {
+            "post": {
                 "produces": [
                     "application/json"
                 ],
-                "summary": "获取github授权码",
+                "summary": "通过code拿取github颁发的token",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "开放平台申请的应用ID",
+                        "description": "授权码",
+                        "name": "code",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "授权客户端id",
                         "name": "client_id",
                         "in": "query",
                         "required": true
                     },
                     {
                         "type": "string",
-                        "description": "授权成功后，跳转的地址",
-                        "name": "redirect_uri",
+                        "description": "客户端密钥",
+                        "name": "client_secret",
                         "in": "query",
                         "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "用户获得授权后被发送到的应用程序中的 URL",
+                        "name": "redirect_uri",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -48,8 +61,32 @@ const docTemplate = `{
                 }
             }
         },
+        "/authorization-code": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "获取github授权码（没有找到swagger对应重定向得注解耶。swagger调试接口还不行，所以只能使用postman或者浏览器测试了）",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "开放平台申请的应用ID",
+                        "name": "client_id",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "授权成功后，跳转的地址,GitHub已配置回调url，此处为可选",
+                        "name": "redirect_uri",
+                        "in": "query"
+                    }
+                ],
+                "responses": {}
+            }
+        },
         "/redirect": {
-            "post": {
+            "get": {
                 "produces": [
                     "application/json"
                 ],
@@ -72,9 +109,50 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/user-info": {
+            "get": {
+                "security": [
+                    {
+                        "CoreAPI": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "通过token拿取资源",
+                "responses": {
+                    "200": {
+                        "description": "请求错误",
+                        "schema": {
+                            "$ref": "#/definitions/model.Err"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
+        "model.AcceptGitHubToken": {
+            "type": "object",
+            "properties": {
+                "access_token": {
+                    "description": "token字符串",
+                    "type": "string"
+                },
+                "scope": {
+                    "type": "string"
+                },
+                "token_type": {
+                    "description": "token类型,一般放在Authorization的bearer字符串后面",
+                    "type": "string"
+                }
+            }
+        },
+        "model.AcceptGitHubUser": {
+            "type": "object",
+            "additionalProperties": true
+        },
         "model.Err": {
             "type": "object",
             "properties": {
