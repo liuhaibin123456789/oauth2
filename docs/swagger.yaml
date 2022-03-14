@@ -10,9 +10,6 @@ definitions:
         description: token类型,一般放在Authorization的bearer字符串后面
         type: string
     type: object
-  model.AcceptGitHubUser:
-    additionalProperties: true
-    type: object
   model.Err:
     properties:
       err_info:
@@ -99,18 +96,6 @@ paths:
           schema:
             $ref: '#/definitions/model.Err'
       summary: 获取重定向后的code url参数
-  /user-info:
-    get:
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: 请求错误
-          schema:
-            $ref: '#/definitions/model.Err'
-      security:
-      - CoreAPI: []
-      summary: 通过token拿取资源
 securityDefinitions:
   CoreAPI:
     in: header

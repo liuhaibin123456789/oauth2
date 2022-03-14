@@ -2,11 +2,11 @@ package api
 
 import (
 	"aouth2Demo/tool"
-	"errors"
+	"encoding/json"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"io"
 	"net/http"
-	"strings"
 )
 
 // CreateCode
@@ -56,31 +56,93 @@ func PostToken(c *gin.Context) {
 	c.Redirect(http.StatusMovedPermanently, "https://github.com/login/oauth/access_token?client_id="+clientId+"&client_secret="+clientSecret+"&code="+code+"&redirect_uri="+redirectUri)
 }
 
-// User
-// @summary  通过token拿取资源
-// @produce  json
-// @success  200       {object}  model.AcceptGitHubUser  "成功"
-// @failure  200       {object}  model.Err  "请求错误"
-// @Security CoreAPI
-// @router   /user-info [get]
-func User(c *gin.Context) {
-	//初步查看并校验token
-	authorization := c.Request.Header.Get("Authorization")
-	if authorization == "" {
-		tool.JsonOutPut(200, errors.New("the Authorization is empty"), "", c)
+//// User
+//// @summary  通过token拿取资源
+//// @produce  json
+//// @success  200       {object}  model.AcceptGitHubUser  "成功"
+//// @failure  200       {object}  model.Err  "请求错误"
+//// @Security CoreAPI
+//// @router   /user-info [get]
+//func User(c *gin.Context) {
+//	//初步查看并校验token
+//	authorization := c.Request.Header.Get("Authorization")
+//	if authorization == "" {
+//		tool.JsonOutPut(200, errors.New("the Authorization is empty"), "", c)
+//		return
+//	}
+//	parts := strings.SplitN(authorization, " ", 2)
+//	if !(len(parts) == 2 && parts[0] == "Bearer") {
+//		tool.JsonOutPut(200, errors.New("authorization header is wrong,no bearer"), "", c)
+//		return
+//	}
+//	//转化header bearer为token
+//	//c.Header("Authorization", "Token "+parts[1])
+//	//重定向
+//	c.Redirect(308, "https://api.github.com/user")
+//}
+
+func User(w http.ResponseWriter, r *http.Request) {
+	defer func(Body io.ReadCloser) {
+		err := Body.Close()
+		if err != nil {
+			return
+		}
+	}(r.Body)
+	var userInfoUrl = "https://api.github.com/user" // github用户信息获取接口
+	var err error
+	//请求
+	r, err = http.NewRequest(http.MethodGet, userInfoUrl, nil)
+	if err != nil {
+		fmt.Println("request is wrong")
 		return
 	}
-	parts := strings.SplitN(authorization, " ", 2)
-	if !(len(parts) == 2 && parts[0] == "Bearer") {
-		tool.JsonOutPut(200, errors.New("authorization header is wrong,no bearer"), "", c)
+	////通过url 传token
+	//token := r.URL.Query().Get("token")
+	//fmt.Println(r.URL, r.URL.Query(), token)
+	//设置请求头
+	r.Header.Set("accept", "application/json")
+	//todo 此处不能获取到请求的token
+	token, err := r.Cookie("token")
+	if err != nil {
+		fmt.Println(err)
 		return
 	}
-	//转化header bearer为token
-	//c.Header("Authorization", "Token "+parts[1])
-	//重定向
-	c.Redirect(308, "https://api.github.com/user")
+	//token := r.Header.Get("token")
+	r.Header.Set("Authorization", fmt.Sprintf("token %s", token))
+	//模拟客户端发起请求
+	client := http.Client{}
+	var res *http.Response
+	if res, err = client.Do(r); err != nil {
+		fmt.Println(fmt.Sprintf(err.Error()))
+		return
+	}
+	defer func(Body io.ReadCloser) {
+		err := Body.Close()
+		if err != nil {
+			return
+		}
+	}(res.Body)
+	//取数据
+	var userInfo = make(map[string]interface{})
+	if err = json.NewDecoder(res.Body).Decode(&userInfo); err != nil {
+		fmt.Println(fmt.Sprintf(err.Error()))
+		return
+	}
+	//返回json
+	var userInfoBytes []byte
+	if userInfoBytes, err = json.Marshal(userInfo); err != nil {
+		fmt.Println(err)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	if _, err = w.Write(userInfoBytes); err != nil {
+		fmt.Println(err)
+		return
+	}
+	return
 }
 
 func CreateUser(c *gin.Context) {
 	//保存用户信息至数据库
+
 }

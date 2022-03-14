@@ -109,27 +109,6 @@ const docTemplate = `{
                     }
                 }
             }
-        },
-        "/user-info": {
-            "get": {
-                "security": [
-                    {
-                        "CoreAPI": []
-                    }
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "summary": "通过token拿取资源",
-                "responses": {
-                    "200": {
-                        "description": "请求错误",
-                        "schema": {
-                            "$ref": "#/definitions/model.Err"
-                        }
-                    }
-                }
-            }
         }
     },
     "definitions": {
@@ -148,10 +127,6 @@ const docTemplate = `{
                     "type": "string"
                 }
             }
-        },
-        "model.AcceptGitHubUser": {
-            "type": "object",
-            "additionalProperties": true
         },
         "model.Err": {
             "type": "object",

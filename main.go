@@ -19,6 +19,7 @@ import (
 // @name Authorization
 // @in header
 func main() {
+
 	router := gin.Default()
 	err := tool.InitMysql()
 	if err != nil {
@@ -30,7 +31,20 @@ func main() {
 	router.GET("/authorization-code", api.CreateCode)                         //获取授权码
 	router.GET("/redirect", api.Code)                                         //该路由用于获取重定向后的code url参数
 	router.POST("/access-token", api.PostToken)                               //通过授权码获取github的token
-	router.GET("/user-info", api.User)                                        //携带token获取用户信息,没有就创建
-	router.POST("user", api.CreateUser)                                       //调用第三方资源获取的信息，实现注册
-	router.Run(":8084")
+	//gin框架提供了对于原生http库的类型转化，这样可以方便地使用到标准库地中间件
+	router.GET("/user-info",
+		func(c *gin.Context) {
+			token := c.Query("token")
+			//c.Set("token", token)
+			c.SetCookie("token", token, 666, "", "", false, true)
+			if token == "" {
+				c.Abort()
+			}
+			c.Next()
+		}, gin.WrapF(api.User)) //携带token获取用户信息,没有就创建
+	router.POST("user", api.CreateUser) //调用第三方资源获取的信息，实现注册
+	err = router.Run(":8084")
+	if err != nil {
+		return
+	}
 }
