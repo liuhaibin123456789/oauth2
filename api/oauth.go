@@ -91,7 +91,7 @@ func User(w http.ResponseWriter, r *http.Request) {
 	var userInfoUrl = "https://api.github.com/user" // github用户信息获取接口
 	var err error
 	//请求
-	r, err = http.NewRequest(http.MethodGet, userInfoUrl, nil)
+	r1, err := http.NewRequest(http.MethodGet, userInfoUrl, nil)
 	if err != nil {
 		fmt.Println("request is wrong")
 		return
@@ -100,19 +100,14 @@ func User(w http.ResponseWriter, r *http.Request) {
 	//token := r.URL.Query().Get("token")
 	//fmt.Println(r.URL, r.URL.Query(), token)
 	//设置请求头
-	r.Header.Set("accept", "application/json")
-	//todo 此处不能获取到请求的token
-	token, err := r.Cookie("token")
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	//token := r.Header.Get("token")
-	r.Header.Set("Authorization", fmt.Sprintf("token %s", token))
+	r1.Header.Set("accept", "application/json")
+	token := r1.Header.Values("token")
+	fmt.Println("token:", token)
+	r1.Header.Set("Authorization", fmt.Sprintf("token %s", token))
 	//模拟客户端发起请求
 	client := http.Client{}
 	var res *http.Response
-	if res, err = client.Do(r); err != nil {
+	if res, err = client.Do(r1); err != nil {
 		fmt.Println(fmt.Sprintf(err.Error()))
 		return
 	}
@@ -142,7 +137,7 @@ func User(w http.ResponseWriter, r *http.Request) {
 	return
 }
 
-func CreateUser(c *gin.Context) {
-	//保存用户信息至数据库
-
-}
+//func CreateUser(c *gin.Context) {
+//	//保存用户信息至数据库
+//
+//}

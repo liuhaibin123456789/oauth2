@@ -35,14 +35,14 @@ func main() {
 	router.GET("/user-info",
 		func(c *gin.Context) {
 			token := c.Query("token")
-			//c.Set("token", token)
-			c.SetCookie("token", token, 666, "", "", false, true)
+			c.Request.Header.Add("token", token)
+			fmt.Println(c.Request.Header.Values("token"))
 			if token == "" {
 				c.Abort()
 			}
 			c.Next()
 		}, gin.WrapF(api.User)) //携带token获取用户信息,没有就创建
-	router.POST("user", api.CreateUser) //调用第三方资源获取的信息，实现注册
+	//router.POST("user", api.CreateUser) //调用第三方资源获取的信息，实现注册
 	err = router.Run(":8084")
 	if err != nil {
 		return
