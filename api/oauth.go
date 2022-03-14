@@ -101,8 +101,7 @@ func User(w http.ResponseWriter, r *http.Request) {
 	//fmt.Println(r.URL, r.URL.Query(), token)
 	//设置请求头
 	r1.Header.Set("accept", "application/json")
-	token := r1.Header.Values("token")
-	fmt.Println("token:", token)
+	token := r.Header.Get("token")
 	r1.Header.Set("Authorization", fmt.Sprintf("token %s", token))
 	//模拟客户端发起请求
 	client := http.Client{}
